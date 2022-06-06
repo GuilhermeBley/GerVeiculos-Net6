@@ -1,3 +1,4 @@
+using ClienteNet6.Server.Context;
 using Microsoft.AspNetCore.ResponseCompression;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +7,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+
+#region Context
+
+builder.Services.AddDbContext<AppGerVeiculosContext>();
+
+#endregion
 
 var app = builder.Build();
 
