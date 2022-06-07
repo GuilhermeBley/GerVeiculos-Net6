@@ -1,5 +1,9 @@
 using ClienteNet6.Server.Context;
+using ClienteNet6.Server.Identity;
+using ClienteNet6.Server.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.ResponseCompression;
+using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,11 +12,47 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+#region Services
+
+builder.Services
+    .AddSingleton<IConfiguration>(builder.Configuration)
+    .AddScoped<ILocalStorageService, LocalStorageService>();
+
+#endregion
 
 #region Context
 
 builder.Services.AddDbContext<AppGerVeiculosContext>();
+
+#endregion
+
+#region Identity
+
+builder.Services.AddIdentity<User, Role>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = true;
+
+    // Password settings.
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequiredUniqueChars = 1;
+
+    // Lockout settings.
+    options.Lockout.DefaultLockoutTimeSpan = System.TimeSpan.FromMinutes(5);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.AllowedForNewUsers = true;
+
+    // User settings.
+    options.User.AllowedUserNameCharacters =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+    options.User.RequireUniqueEmail = true;
+
+})
+.AddEntityFrameworkStores<AppGerVeiculosContext>()
+.AddDefaultTokenProviders();
 
 #endregion
 

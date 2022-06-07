@@ -25,9 +25,5 @@
     <ProjectReference Include="..\Shared\ClienteNet6.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
 
 </Project>

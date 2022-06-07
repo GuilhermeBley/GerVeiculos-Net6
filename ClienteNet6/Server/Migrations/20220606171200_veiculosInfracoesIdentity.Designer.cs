@@ -3,6 +3,7 @@ using System;
 using ClienteNet6.Server.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ClienteNet6.Server.Migrations
 {
     [DbContext(typeof(AppGerVeiculosContext))]
-    partial class AppGerVeiculosContextModelSnapshot : ModelSnapshot
+    [Migration("20220606171200_veiculosInfracoesIdentity")]
+    partial class veiculosInfracoesIdentity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,8 +103,7 @@ namespace ClienteNet6.Server.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("NomeEmpresa")
-                        .IsRequired()
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)

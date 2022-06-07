@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Microsoft.Extensions.Configuration;
+using ClienteNet6.Server.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace ClienteNet6.Server.Context
 {
@@ -38,7 +40,8 @@ namespace ClienteNet6.Server.Context
 
      */
 
-    public class AppGerVeiculosContext : DbContext
+    public class AppGerVeiculosContext : IdentityDbContext<User, Role, int,
+                                            UserClaim, UserRole, UserLogin, RoleClaim, UserToken>
     {
         private readonly IConfiguration _Configuration;
         public DbSet<Veiculo> Veiculos { get; set; }
@@ -51,16 +54,20 @@ namespace ClienteNet6.Server.Context
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            base.OnConfiguring(optionsBuilder);
+
             optionsBuilder.UseMySql(
                 _Configuration.GetConnectionString("DbGerVeiculos"),
                 ServerVersion.AutoDetect(_Configuration.GetConnectionString("DbGerVeiculos"))
             );
 
-            base.OnConfiguring(optionsBuilder);
+            
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            base.OnModelCreating(builder);
+
             builder.HasCharSet("latin1");
 
             builder.Entity<Veiculo>().HasCharSet("latin1");
@@ -68,7 +75,15 @@ namespace ClienteNet6.Server.Context
             builder.Entity<Veiculo>().HasIndex(u => u.Placa);
             builder.Entity<Infracao>().HasCharSet("latin1");
 
-            base.OnModelCreating(builder);
+            // identity
+            builder.Entity<User>().HasCharSet("latin1");
+            builder.Entity<Role>().HasCharSet("latin1");
+            builder.Entity<UserToken>().HasCharSet("latin1");
+            builder.Entity<UserLogin>().HasCharSet("latin1");
+            builder.Entity<RoleClaim>().HasCharSet("latin1");
+            builder.Entity<UserRole>().HasCharSet("latin1");
+            builder.Entity<UserClaim>().HasCharSet("latin1");
+
         }
     }
 }
