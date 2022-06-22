@@ -1,4 +1,5 @@
 ﻿using ClienteNet6.Server.Identity;
+using ClienteNet6.Server.Services;
 using ClienteNet6.Shared.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -14,10 +15,12 @@ namespace ClienteNet6.Server.Controllers
     public class UsuarioController : Controller
     {
         private readonly UserManager<User> _userManager;
+        private readonly ITokenService _tokenService;
 
-        public UsuarioController(UserManager<User> userManager, SignInManager<User> signInManager)
+        public UsuarioController(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService)
         {
             _userManager = userManager;
+            _tokenService = tokenService;
         }
 
         [HttpGet]
@@ -27,7 +30,7 @@ namespace ClienteNet6.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] LoginCreate userDto)
+        public async Task<ActionResult<UserTokenJwt>> Post([FromBody] LoginCreate userDto)
         {
             if (string.IsNullOrEmpty(userDto.Email))
                 return BadRequest(nameof(userDto.Email));
@@ -48,7 +51,7 @@ namespace ClienteNet6.Server.Controllers
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(System.Text.Encoding.UTF8.GetBytes(code));
 
-                    return Ok();
+                    return Ok(_tokenService.GetToken(user));
                 }
                 else
                 {

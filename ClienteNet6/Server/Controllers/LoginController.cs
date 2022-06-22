@@ -1,4 +1,5 @@
 ﻿using ClienteNet6.Server.Identity;
+using ClienteNet6.Server.Services;
 using ClienteNet6.Shared.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -16,11 +17,13 @@ namespace ClienteNet6.Server.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly ITokenService _tokenService;
 
-        public LoginController(UserManager<User> userManager, SignInManager<User> signInManager)
+        public LoginController(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _tokenService = tokenService;
         }        
 
         [HttpGet]
@@ -30,7 +33,7 @@ namespace ClienteNet6.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] LoginUser userDto)
+        public async Task<ActionResult<UserTokenJwt>> Post([FromBody] LoginUser userDto)
         {
             if (ModelState.IsValid)
             {
@@ -50,7 +53,7 @@ namespace ClienteNet6.Server.Controllers
 
                 if (result.Succeeded)
                 {
-                    return Ok();
+                    return Ok(_tokenService.GetToken(user));
                 }
                 else
                 {
