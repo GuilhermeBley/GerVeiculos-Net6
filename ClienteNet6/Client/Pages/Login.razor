@@ -1,8 +1,30 @@
-﻿@page "/Login"
+﻿@using ClienteNet6.Client.Components;
+
+@page "/Login"
+@page "/Register"
+
+@inject NavigationManager Navigation;
+
 @layout LoginLayout
 
-<h3>Login</h3>
+@if (IsLogin)
+{
+    <LoginComponent OnRegister="@SetRegister"></LoginComponent>
+}
+else{
+    <RegisterComponent OnClose="@SetLogin"></RegisterComponent>
+}
 
 @code {
+    private bool IsLogin { get; set; } = true;
 
+    private void SetLogin()
+    {
+        IsLogin = true;
+    }
+
+    private void SetRegister()
+    {
+        IsLogin = false;
+    }
 }
