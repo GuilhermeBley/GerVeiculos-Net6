@@ -1,18 +1,20 @@
 ﻿@using ClienteNet6.Client.Components;
+@using ClienteNet6.Shared.Dto
 
 @page "/Login"
-@page "/Register"
 
 @inject NavigationManager Navigation;
+@inject HttpClient Client;
+
 
 @layout LoginLayout
 
 @if (IsLogin)
 {
-    <LoginComponent OnRegister="@SetRegister"></LoginComponent>
+    <LoginComponent OnRegister="@SetRegister" OnValid="@ValidLogin"></LoginComponent>
 }
 else{
-    <RegisterComponent OnClose="@SetLogin"></RegisterComponent>
+    <RegisterComponent OnClose="@SetLogin" OnValid="@ValidRegister"></RegisterComponent>
 }
 
 @code {
@@ -26,5 +28,15 @@ else{
     private void SetRegister()
     {
         IsLogin = false;
+    }
+
+    private void ValidLogin(LoginUser login)
+    {
+
+    }
+
+    private void ValidRegister(LoginCreate loginCreate)
+    {
+        
     }
 }

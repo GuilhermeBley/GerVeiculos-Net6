@@ -5,7 +5,7 @@
         <div class="card">
             <h3 class="card-header">Login</h3>
             <div class="card-body">
-                <EditForm Model="@LoginDto">
+                <EditForm Model="@LoginDto" OnValidSubmit="@(()=>OnValid.InvokeAsync(LoginDto))">
                     <DataAnnotationsValidator />
                     <div class="form-group">
                         <label for="email">Email</label>
@@ -32,6 +32,9 @@
 @code {
     [Parameter]
     public EventCallback OnRegister { get; set; }
+
+    [Parameter]
+    public EventCallback<LoginUser> OnValid { get; set; }
 
     private LoginUser LoginDto = new();
 
