@@ -35,31 +35,27 @@ namespace ClienteNet6.Server.Controllers
             if (string.IsNullOrEmpty(userDto.Email))
                 return BadRequest(nameof(userDto.Email));
 
-            if (ModelState.IsValid)
+            
+            if (await _userManager.FindByNameAsync(userDto.Email) is not null)
             {
-                if (await _userManager.FindByNameAsync(userDto.Email) is not null)
-                {
-                    return BadRequest("Usuário já existente.");
-                }
-
-                var user = new User { Email = userDto.Email, UserName = userDto.Email, NormalizedUserName = userDto.Email, NomeEmpresa = userDto.NomeEmpresa };
-
-                var result = await _userManager.CreateAsync(user, userDto.Password);
-
-                if (result.Succeeded)
-                {
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(System.Text.Encoding.UTF8.GetBytes(code));
-
-                    return Ok(_tokenService.GetToken(user));
-                }
-                else
-                {
-                    return BadRequest(result.Errors);
-                }
+                return BadRequest("Usuário já existente.");
             }
 
-            return BadRequest("Modelo inválido");
+            var user = new User { Email = userDto.Email, UserName = userDto.Email, NormalizedUserName = userDto.Email, NomeEmpresa = userDto.NomeEmpresa };
+
+            var result = await _userManager.CreateAsync(user, userDto.Password);
+
+            if (result.Succeeded)
+            {
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                code = WebEncoders.Base64UrlEncode(System.Text.Encoding.UTF8.GetBytes(code));
+
+                return Ok(_tokenService.GetToken(user));
+            }
+            else
+            {
+                return BadRequest("Senha requer letra maiúscula, minúscula, caracteres numéricos e especiais.");
+            }
         }
     }
 }

@@ -1,24 +1,42 @@
-﻿@using ClienteNet6.Client.Components;
+﻿@using ClienteNet6.Client.AuthClient.Interfaces
+@using ClienteNet6.Client.Components;
 @using ClienteNet6.Shared.Dto
+@using System.Net
 
 @page "/Login"
 
+@inject IAuthToken _tokenManager;
 @inject NavigationManager Navigation;
 @inject HttpClient Client;
 
 
 @layout LoginLayout
 
-@if (IsLogin)
-{
-    <LoginComponent OnRegister="@SetRegister" OnValid="@ValidLogin"></LoginComponent>
-}
-else{
-    <RegisterComponent OnClose="@SetLogin" OnValid="@ValidRegister"></RegisterComponent>
-}
+<ErrorComponent Errors="ErrorList"></ErrorComponent>
+<OkComponent SucessMessages="SucessList"></OkComponent>
+
+<AuthorizeView>
+    <Authorized>@{
+            Navigation.NavigateTo("/");
+        }</Authorized>
+    <NotAuthorized>
+        @if (IsLogin)
+        {
+            <LoginComponent OnRegister="@SetRegister" OnValid="@ValidLogin"></LoginComponent>
+        }
+        else
+        {
+            <RegisterComponent OnClose="@SetLogin" OnValid="@ValidRegister"></RegisterComponent>
+        }
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
     private bool IsLogin { get; set; } = true;
+
+    private readonly List<string> SucessList = new();
+
+    private readonly List<string> ErrorList = new();
 
     private void SetLogin()
     {
@@ -30,13 +48,80 @@ else{
         IsLogin = false;
     }
 
-    private void ValidLogin(LoginUser login)
+    private async Task ValidLogin(LoginUser login)
     {
+        ClearError();
 
+        var response = await Client.PostAsJsonAsync("api/login", login);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
+            {
+                ErrorList.Add("E-mail ou senha inválidos.");
+                return;
+            }
+
+            ErrorList.Add("Erro ao efetuar Login.");
+            return;
+        }
+
+        var token = (await response.Content.ReadFromJsonAsync<UserTokenJwt>());
+
+        if (token is null)
+        {
+            ErrorList.Add("Falha ao gerar Token");
+            return;
+        }
+
+        string tokenteste = token.Token;
+        string tokenteste2 = token.Token.Replace("'","");
+        string tokenteste3 = token.Token.Replace("\"","");
+
+        await _tokenManager.SetToken(token.Token);
+
+        SucessList.Add("Login efetuado com sucesso. Redirecionando para Home.");
+
+        Navigation.NavigateTo("/");
     }
 
-    private void ValidRegister(LoginCreate loginCreate)
+    private async Task ValidRegister(LoginCreate loginCreate)
     {
-        
+        ClearError();
+
+        var response = await Client.PostAsJsonAsync("api/usuario", loginCreate);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            if (response.StatusCode is HttpStatusCode.BadRequest)
+            {
+                string message = await response.Content.ReadAsStringAsync();
+
+                ErrorList.Add(message);
+                return;
+            }
+
+            ErrorList.Add("Falha ao criar conta.");
+        }
+
+        var token = (await response.Content.ReadFromJsonAsync<UserTokenJwt>());
+
+        if (token is null)
+        {
+            ErrorList.Add("Falha ao gerar Token");
+            return;
+        }
+
+        await _tokenManager.SetToken(token.Token);
+
+        SucessList.Add("Conta criada com sucesso. Redirecionando para Home.");
+
+        Navigation.NavigateTo("/");
+    }
+
+    private void ClearError()
+    {
+        if (ErrorList.Any())
+            ErrorList.RemoveRange(0, ErrorList.Count);
     }
 }
