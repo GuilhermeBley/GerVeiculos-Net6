@@ -43,7 +43,7 @@ namespace ClienteNet6.Server.Controllers
                 return Unauthorized();
             }
 
-            var result = await _signInManager.PasswordSignInAsync(user, userDto.Password, false, false);
+            var result = await _signInManager.CheckPasswordSignInAsync(user, userDto.Password, false);
 
             if (result.IsNotAllowed)
             {
@@ -58,8 +58,6 @@ namespace ClienteNet6.Server.Controllers
             {
                 return Unauthorized();
             }
-
-            return BadRequest("Modelo inválido");
         }
     }
 }

@@ -75,14 +75,14 @@
         }
 
         string tokenteste = token.Token;
-        string tokenteste2 = token.Token.Replace("'","");
+        string tokenteste2 = token.Token.Replace("\"","");
         string tokenteste3 = token.Token.Replace("\"","");
 
         await _tokenManager.SetToken(token.Token);
 
         SucessList.Add("Login efetuado com sucesso. Redirecionando para Home.");
 
-        Navigation.NavigateTo("/");
+        Navigation.NavigateTo("/", true);
     }
 
     private async Task ValidRegister(LoginCreate loginCreate)
@@ -117,7 +117,7 @@
 
         SucessList.Add("Conta criada com sucesso. Redirecionando para Home.");
 
-        Navigation.NavigateTo("/");
+        Navigation.NavigateTo("/", true);
     }
 
     private void ClearError()

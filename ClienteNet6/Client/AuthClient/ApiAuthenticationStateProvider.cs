@@ -62,7 +62,7 @@ namespace ClienteNet6.Client.AuthClient
 
             // Unauthorized
             _httpClient.DefaultRequestHeaders.Authorization = null;
-            RemoveToken();
+            await RemoveToken();
 
             return _defaultAuthentication;
         }

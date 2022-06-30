@@ -35,7 +35,7 @@ var builder = WebApplication.CreateBuilder(args);
 
     builder.Services.AddIdentityCore<User>(options =>
     {
-        options.SignIn.RequireConfirmedAccount = false;
+        options.SignIn.RequireConfirmedAccount = true;
 
         // Password settings.
         options.Password.RequireDigit = true;
@@ -58,8 +58,8 @@ var builder = WebApplication.CreateBuilder(args);
     })
     .AddEntityFrameworkStores<AppGerVeiculosContext>()
     .AddUserManager<UserManager<User>>()
-    .AddSignInManager<SignInManager<User>>()
-    .AddDefaultTokenProviders();
+    .AddSignInManager<SignInManager<User>>();
+
 
     #endregion
 
@@ -68,7 +68,13 @@ var builder = WebApplication.CreateBuilder(args);
     var key = System.Text.Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);
 
     builder.Services
-        .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddAuthentication(options =>
+        {
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+        })
         .AddJwtBearer(optionsBearer =>
             {
                 optionsBearer.RequireHttpsMetadata = false;
@@ -83,7 +89,6 @@ var builder = WebApplication.CreateBuilder(args);
                 };
             }
         );
-
     #endregion
 }
 
