@@ -12,7 +12,7 @@ namespace ClienteNet6.Server.Controllers
     /// Lida com CRUD de usuarios
     /// </summary>
     [ApiController, AllowAnonymous, Route("api/[controller]"), Produces("application/json")]
-    public class UsuarioController : Controller
+    public class UsuarioController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
         private readonly ITokenService _tokenService;

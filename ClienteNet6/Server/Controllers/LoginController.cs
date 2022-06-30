@@ -13,7 +13,7 @@ namespace ClienteNet6.Server.Controllers
     /// Gerencia sessao de login
     /// </summary>
     [ApiController, Route("api/[controller]"), Produces("application/json")]
-    public class LoginController : Controller
+    public class LoginController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
@@ -35,30 +35,28 @@ namespace ClienteNet6.Server.Controllers
         [HttpPost, AllowAnonymous]
         public async Task<ActionResult<UserTokenJwt>> Post([FromBody] LoginUser userDto)
         {
-            if (ModelState.IsValid)
+           
+            var user = await _userManager.FindByEmailAsync(userDto.UserName);
+
+            if (user == null)
             {
-                var user = await _userManager.FindByEmailAsync(userDto.UserName);
+                return Unauthorized();
+            }
 
-                if (user == null)
-                {
-                    return Unauthorized();
-                }
+            var result = await _signInManager.PasswordSignInAsync(user, userDto.Password, false, false);
 
-                var result = await _signInManager.PasswordSignInAsync(user, userDto.Password, false, false);
+            if (result.IsNotAllowed)
+            {
+                return Unauthorized();
+            }
 
-                if (result.IsNotAllowed)
-                {
-                    return Unauthorized();
-                }
-
-                if (result.Succeeded)
-                {
-                    return Ok(_tokenService.GetToken(user));
-                }
-                else
-                {
-                    return Unauthorized();
-                }
+            if (result.Succeeded)
+            {
+                return Ok(_tokenService.GetToken(user));
+            }
+            else
+            {
+                return Unauthorized();
             }
 
             return BadRequest("Modelo inválido");

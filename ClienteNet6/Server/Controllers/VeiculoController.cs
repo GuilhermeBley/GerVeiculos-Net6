@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.WebUtilities;
 namespace ClienteNet6.Server.Controllers
 {
     [ApiController, Route("api/[controller]"), Produces("application/json")]
-    public class VeiculoController : Controller
+    public class VeiculoController : ControllerBase
     {
         public VeiculoController()
         {
