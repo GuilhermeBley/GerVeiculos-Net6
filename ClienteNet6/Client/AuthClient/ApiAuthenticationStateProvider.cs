@@ -44,16 +44,27 @@ namespace ClienteNet6.Client.AuthClient
             }
 
             var token = handler.ReadJwtToken(savedToken);
-            
+
             _httpClient.DefaultRequestHeaders.Authorization =
-                 new AuthenticationHeaderValue("Bearer", savedToken);
-            
-            return 
-                new AuthenticationState(new ClaimsPrincipal(
-                    new ClaimsIdentity(
-                        token.Claims, "jwt")
-                )
-            );
+                 new AuthenticationHeaderValue("bearer", savedToken);
+
+            var response = await _httpClient.GetAsync("/api/login");
+
+            if (response.IsSuccessStatusCode)
+            {
+                return
+                    new AuthenticationState(new ClaimsPrincipal(
+                        new ClaimsIdentity(
+                            token.Claims, "jwt")
+                    )
+                );
+            }
+
+            // Unauthorized
+            _httpClient.DefaultRequestHeaders.Authorization = null;
+            RemoveToken();
+
+            return _defaultAuthentication;
         }
 
         public async Task GetToken()

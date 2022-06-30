@@ -111,7 +111,7 @@ var app = builder.Build();
     app.UseAuthentication();
     app.UseAuthorization();
 
-    app.MapRazorPages();
+    app.MapRazorPages().RequireAuthorization();
     app.MapControllers().RequireAuthorization();
     app.MapFallbackToFile("index.html");
 

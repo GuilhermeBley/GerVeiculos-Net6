@@ -12,7 +12,7 @@ namespace ClienteNet6.Server.Controllers
     /// <summary>
     /// Gerencia sessao de login
     /// </summary>
-    [ApiController, AllowAnonymous, Route("api/[controller]"), Produces("application/json")]
+    [ApiController, Route("api/[controller]"), Produces("application/json")]
     public class LoginController : Controller
     {
         private readonly UserManager<User> _userManager;
@@ -26,13 +26,13 @@ namespace ClienteNet6.Server.Controllers
             _tokenService = tokenService;
         }        
 
-        [HttpGet]
+        [HttpGet, Authorize]
         public IActionResult Get()
         {
             return Ok();
         }
 
-        [HttpPost]
+        [HttpPost, AllowAnonymous]
         public async Task<ActionResult<UserTokenJwt>> Post([FromBody] LoginUser userDto)
         {
             if (ModelState.IsValid)
