@@ -8,6 +8,10 @@ namespace ClienteNet6.Shared.Dto
         [StringLength(100, MinimumLength = 1, ErrorMessage = "Nome de empresa inválido.")]
         public string NomeEmpresa { get; set; }
 
+        [Required(ErrorMessage = "Nome é obrigatório.")]
+        [StringLength(100, MinimumLength = 1, ErrorMessage = "Nome inválido.")]
+        public string Nome { get; set; }    
+
         [Required(ErrorMessage = "E-mail é obrigatório.")]
         [EmailAddress(ErrorMessage ="Email inválido.")]
         public string Email { get; set; }

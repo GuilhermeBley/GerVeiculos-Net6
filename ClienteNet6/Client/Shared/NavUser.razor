@@ -1,0 +1,32 @@
+﻿@using System.Security.Claims
+@using ClienteNet6.Client.AuthClient.Interfaces
+@using ClienteNet6.Shared.Dto
+
+@inject IAuthToken ManageToken;
+
+@if (User is not null)
+{
+    <nav>
+        <p>Select country from the DropDownList</p>
+
+        <select class="form-control">
+        </select>
+    </nav>
+}
+
+
+@code {
+    [CascadingParameter]
+    private Task<UserInfo>? user { get; set; }
+
+    private List<(string View, string AcessUrl)> DropDownUser =>
+        new List<(string, string)>() { ("Configurar", "/user"), ("Sair", "/logout") };
+
+    private UserInfo? User { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        User = ManageToken.GetUser();
+        await base.OnInitializedAsync();
+    }
+}

@@ -35,7 +35,7 @@ var builder = WebApplication.CreateBuilder(args);
 
     builder.Services.AddIdentityCore<User>(options =>
     {
-        options.SignIn.RequireConfirmedAccount = true;
+        options.SignIn.RequireConfirmedAccount = false;
 
         // Password settings.
         options.Password.RequireDigit = true;

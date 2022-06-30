@@ -1,27 +1,34 @@
-﻿@inherits LayoutComponentBase
+﻿@using System.Security.Claims
+@using ClienteNet6.Shared.Dto
+@inherits LayoutComponentBase
 
 @inject NavigationManager Navigation;
 
-<AuthorizeView>
-    <Authorized>
-        <div class="page">
-            <div class="sidebar">
-                <NavMenu />
-            </div>
-
-            <main>
-                <div class="top-row px-4">
-                    <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            <div class="page">
+                <div class="sidebar">
+                    <NavMenu />
                 </div>
 
-                <article class="content px-4">
-                    @Body
-                </article>
-            </main>
-        </div>
-    </Authorized>
-    <NotAuthorized>
-        <div class="">Não autorizado</div>
-         @{ Navigation.NavigateTo("login"); }
-    </NotAuthorized>
-</AuthorizeView>
+                <main>
+                    <div class="top-row px-4">
+                        <NavUser></NavUser>
+                    </div>
+
+                    <article class="content px-4">
+                        @Body
+                    </article>
+                </main>
+            </div>
+
+        </Authorized>
+        <NotAuthorized>
+            <div class="">Não autorizado</div>
+            @{
+                Navigation.NavigateTo("login");
+            }
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>

@@ -74,10 +74,6 @@
             return;
         }
 
-        string tokenteste = token.Token;
-        string tokenteste2 = token.Token.Replace("\"","");
-        string tokenteste3 = token.Token.Replace("\"","");
-
         await _tokenManager.SetToken(token.Token);
 
         SucessList.Add("Login efetuado com sucesso. Redirecionando para Home.");

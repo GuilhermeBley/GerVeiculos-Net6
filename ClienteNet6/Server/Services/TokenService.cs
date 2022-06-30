@@ -37,9 +37,10 @@ namespace ClienteNet6.Server.Services
                 // Claims
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim(ClaimTypes.Name, usuario.UserName),
-                    new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
-                    new Claim(JwtRegisteredClaimNames.UniqueName, usuario.Email)
+                    new Claim(JwtRegisteredClaimNames.Name, usuario.UserName),
+                    new Claim(JwtRegisteredClaimNames.NameId, usuario.Id.ToString()),
+                    new Claim(JwtRegisteredClaimNames.FamilyName, usuario.NomeEmpresa),
+                    new Claim(JwtRegisteredClaimNames.Email, usuario.Email)
                 })
             };
 
