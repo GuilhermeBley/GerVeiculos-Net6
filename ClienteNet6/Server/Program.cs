@@ -9,8 +9,13 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 {
     // Add services to the container.
-    builder.Services.AddControllersWithViews();
-    builder.Services.AddRazorPages();
+    builder.Services.AddControllers();
+    builder.Services
+        .AddRazorPages()
+        .AddRazorPagesOptions(options =>
+        {
+            options.Conventions.AuthorizePage("/login");
+        });
 
     #region Services
 
@@ -28,11 +33,11 @@ var builder = WebApplication.CreateBuilder(args);
 
     #region Identity
 
-    builder.Services.AddIdentity<User, Role>(options =>
+    builder.Services.AddIdentityCore<User>(options =>
     {
         options.SignIn.RequireConfirmedAccount = true;
 
-    // Password settings.
+        // Password settings.
         options.Password.RequireDigit = true;
         options.Password.RequireLowercase = true;
         options.Password.RequireNonAlphanumeric = true;
@@ -40,18 +45,20 @@ var builder = WebApplication.CreateBuilder(args);
         options.Password.RequiredLength = 6;
         options.Password.RequiredUniqueChars = 1;
 
-    // Lockout settings.
+        // Lockout settings.
         options.Lockout.DefaultLockoutTimeSpan = System.TimeSpan.FromMinutes(5);
         options.Lockout.MaxFailedAccessAttempts = 5;
         options.Lockout.AllowedForNewUsers = true;
 
-    // User settings.
+        // User settings.
         options.User.AllowedUserNameCharacters =
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
         options.User.RequireUniqueEmail = true;
 
     })
     .AddEntityFrameworkStores<AppGerVeiculosContext>()
+    .AddUserManager<UserManager<User>>()
+    .AddSignInManager<SignInManager<User>>()
     .AddDefaultTokenProviders();
 
     #endregion
@@ -82,8 +89,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 var app = builder.Build();
 {
-
-
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
     {
@@ -103,20 +108,11 @@ var app = builder.Build();
 
     app.UseRouting();
 
-    app.UseStatusCodePages(context =>
-    {
-        var response = context.HttpContext.Response;
-        if (response.StatusCode == (int)System.Net.HttpStatusCode.Unauthorized ||
-            response.StatusCode == (int)System.Net.HttpStatusCode.Forbidden)
-            response.Redirect("/Login");
-        return Task.CompletedTask;
-    });
-
     app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapRazorPages();
-    app.MapControllers();
+    app.MapControllers().RequireAuthorization();
     app.MapFallbackToFile("index.html");
 
     app.Run();

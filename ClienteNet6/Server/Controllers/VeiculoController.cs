@@ -17,7 +17,6 @@ namespace ClienteNet6.Server.Controllers
         }
 
         [HttpGet]
-        [Authorize]
         public IActionResult Get()
         {
             return Ok();

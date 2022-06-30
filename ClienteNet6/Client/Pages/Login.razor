@@ -102,6 +102,7 @@
             }
 
             ErrorList.Add("Falha ao criar conta.");
+            return;
         }
 
         var token = (await response.Content.ReadFromJsonAsync<UserTokenJwt>());

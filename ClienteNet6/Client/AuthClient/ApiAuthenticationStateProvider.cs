@@ -1,5 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using ClienteNet6.Client.AuthClient.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
@@ -13,6 +14,7 @@ namespace ClienteNet6.Client.AuthClient
 
         private readonly ILocalStorageService _localStorage;
         private readonly HttpClient _httpClient;
+        private AuthenticationState _defaultAuthentication => new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 
         public ApiAuthenticationStateProvider(HttpClient httpClient, ILocalStorageService localStorage)
         {
@@ -31,20 +33,26 @@ namespace ClienteNet6.Client.AuthClient
 
             if (string.IsNullOrWhiteSpace(savedToken))
             {
-                return 
-                    await Task.FromResult(
-                        new AuthenticationState(new 
-                            ClaimsPrincipal(new ClaimsIdentity())
-                        )
-                    );
+                return await Task.FromResult(_defaultAuthentication);
             }
 
+            var handler = new JwtSecurityTokenHandler();
+
+            if (!handler.CanReadToken(savedToken))
+            {
+                return await Task.FromResult(_defaultAuthentication);
+            }
+
+            var token = handler.ReadJwtToken(savedToken);
+            
             _httpClient.DefaultRequestHeaders.Authorization =
                  new AuthenticationHeaderValue("Bearer", savedToken);
             
-            return new AuthenticationState(new ClaimsPrincipal(
-                new ClaimsIdentity(
-                    new JwtSecurityTokenHandler().ReadJwtToken(savedToken).Claims, "jwt"))
+            return 
+                new AuthenticationState(new ClaimsPrincipal(
+                    new ClaimsIdentity(
+                        token.Claims, "jwt")
+                )
             );
         }
 
