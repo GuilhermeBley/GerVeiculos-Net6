@@ -16,9 +16,9 @@
 <OkComponent SucessMessages="SucessList"></OkComponent>
 
 <AuthorizeView>
-    <Authorized>@{
-            Navigation.NavigateTo("/");
-        }</Authorized>
+    <Authorized>
+        @{ Navigation.NavigateTo("/"); }
+    </Authorized>
     <NotAuthorized>
         @if (IsLogin)
         {

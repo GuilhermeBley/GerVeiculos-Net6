@@ -3,15 +3,29 @@
 @using ClienteNet6.Shared.Dto
 
 @inject IAuthToken ManageToken;
+@inject NavigationManager Navigation;
 
 @if (User is not null)
 {
-    <nav>
+    @*<nav>
         <p>Select country from the DropDownList</p>
 
         <select class="form-control">
         </select>
-    </nav>
+    </nav>*@
+
+    <div class="container-fluid px-1">
+        <div class="row">
+            <div class="col-md-8 pt-1">
+                Olá @User.UserName
+            </div>
+            <div class="col-6 col-md-4 text-end">
+                <img src="/images/user.png" width="32" height="32">
+                <button type="button" class="btn btn-light btn-outline-secondary text-black" @onclick=@(()=> LogOut())>Sair</button>
+            </div>
+        </div>
+    </div>
+
 }
 
 
@@ -28,5 +42,11 @@
     {
         User = ManageToken.GetUser();
         await base.OnInitializedAsync();
+    }
+
+    private async Task LogOut()
+    {
+        await ManageToken.RemoveToken();
+        Navigation.NavigateTo("/", true);
     }
 }
