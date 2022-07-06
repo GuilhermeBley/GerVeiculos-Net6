@@ -18,7 +18,7 @@ namespace ClienteNet6.Server.Services
     public class UserService : IUserService
     {
         private readonly IHttpContextAccessor _contextAcessor;
-        private static readonly UserInfo EmptyUser = new UserInfo();
+        private static readonly UserInfo EmptyUser = new();
 
         public UserService(IHttpContextAccessor contextAccessor)
         {

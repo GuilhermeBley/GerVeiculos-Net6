@@ -8,19 +8,16 @@ namespace ClienteNet6.Server.Controllers
     [ApiController, Route("api/[controller]"), Produces("application/json")]
     public class VeiculoController : ControllerBase
     {
-        private readonly AppGerVeiculosContext _context;
-        private readonly IUserService _userInfo;
+        private readonly IVeiculoService _veiculoService;
 
-        public VeiculoController(AppGerVeiculosContext context, IUserService userInfo)
+        public VeiculoController(IVeiculoService veiculoService)
         {
-            _context = context;
-            _userInfo = userInfo;
+            _veiculoService = veiculoService;
         }
 
         [HttpGet, Authorize]
         public IActionResult Get()
         {
-            var user = _userInfo.GetUser();
             return Ok();
         }
     }
