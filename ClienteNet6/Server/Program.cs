@@ -22,7 +22,9 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services
         .AddSingleton<IConfiguration>(builder.Configuration)
         .AddScoped<ILocalStorageService, LocalStorageService>()
-        .AddScoped<ITokenService, TokenService>();
+        .AddScoped<ITokenService, TokenService>()
+        .AddTransient<IUserService, UserService>();
+
     #endregion
 
     #region Context
