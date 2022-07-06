@@ -20,6 +20,7 @@ namespace ClienteNet6.Server.Controllers
         [HttpGet, Authorize]
         public IActionResult Get()
         {
+            var user = _userInfo.GetUser();
             return Ok();
         }
     }

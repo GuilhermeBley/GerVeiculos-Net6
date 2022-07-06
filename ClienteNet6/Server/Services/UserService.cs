@@ -1,4 +1,5 @@
 ﻿using ClienteNet6.Shared.Dto;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace ClienteNet6.Server.Services
@@ -16,18 +17,18 @@ namespace ClienteNet6.Server.Services
     /// </summary>
     public class UserService : IUserService
     {
-        private readonly HttpClient _httpClient;
+        private readonly IHttpContextAccessor _contextAcessor;
         private static readonly UserInfo EmptyUser = new UserInfo();
 
-        public UserService(HttpClient httpClient, ILocalStorageService localStorage)
+        public UserService(IHttpContextAccessor contextAccessor)
         {
-            _httpClient = httpClient;
+            _contextAcessor = contextAccessor;
         }
 
         public UserInfo GetUser()
         {
-            string token = _httpClient.DefaultRequestHeaders.Authorization is null ? null : _httpClient.DefaultRequestHeaders.Authorization.Parameter;
-
+            string token = ((string)_contextAcessor.HttpContext.Request.Headers.Authorization).Replace(JwtBearerDefaults.AuthenticationScheme,"");
+            
             if (string.IsNullOrEmpty(token))
                 return EmptyUser;
 
