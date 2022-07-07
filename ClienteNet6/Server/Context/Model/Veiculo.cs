@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ClienteNet6.Shared.EntityFramework
+namespace ClienteNet6.Server.Context.Model
 {
     [Table("Veiculo")]
     public class Veiculo

@@ -1,13 +1,7 @@
-﻿using ClienteNet6.Shared.EntityFramework;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
 using ClienteNet6.Server.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using ClienteNet6.Server.Context.Model;
 
 namespace ClienteNet6.Server.Context
 {
@@ -46,6 +40,7 @@ namespace ClienteNet6.Server.Context
         private readonly IConfiguration _Configuration;
         public DbSet<Veiculo> Veiculos { get; set; }
         public DbSet<Infracao> Infracoes { get; set; }
+        public DbSet<UsuarioVeiculo> UsuarioVeiculos { get; set; }
 
         public AppGerVeiculosContext(IConfiguration configurantion, [System.Diagnostics.CodeAnalysis.NotNull] DbContextOptions options) : base(options)
         {
@@ -61,7 +56,7 @@ namespace ClienteNet6.Server.Context
                 ServerVersion.AutoDetect(_Configuration.GetConnectionString("DbGerVeiculos"))
             );
 
-            
+
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -84,6 +79,17 @@ namespace ClienteNet6.Server.Context
             builder.Entity<UserRole>().HasCharSet("latin1");
             builder.Entity<UserClaim>().HasCharSet("latin1");
 
+            builder.Entity<UsuarioVeiculo>()
+                .HasCharSet("latin1")
+                .HasKey(key => new { key.IdVeiculo, key.IdUser });
+            builder.Entity<UsuarioVeiculo>()
+                .HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(fk => fk.IdUser);
+            builder.Entity<UsuarioVeiculo>()
+                .HasOne(p => p.Veiculo)
+                .WithMany()
+                .HasForeignKey(fk => fk.IdVeiculo);
         }
     }
 }

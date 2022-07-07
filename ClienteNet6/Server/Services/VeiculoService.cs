@@ -1,5 +1,4 @@
 ﻿using ClienteNet6.Server.Context;
-using ClienteNet6.Shared.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClienteNet6.Server.Services
