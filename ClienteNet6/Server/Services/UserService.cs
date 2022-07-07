@@ -27,7 +27,7 @@ namespace ClienteNet6.Server.Services
 
         public UserInfo GetUser()
         {
-            string token = ((string)_contextAcessor.HttpContext.Request.Headers.Authorization).Replace(JwtBearerDefaults.AuthenticationScheme,"");
+            string token = ((string)_contextAcessor.HttpContext.Request.Headers.Authorization).Replace(JwtBearerDefaults.AuthenticationScheme+" ","");
             
             if (string.IsNullOrEmpty(token))
                 return EmptyUser;

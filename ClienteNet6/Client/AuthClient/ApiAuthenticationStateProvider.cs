@@ -24,7 +24,7 @@ namespace ClienteNet6.Client.AuthClient
             {
                 Email = "",
                 Empresa = "",
-                Id = null,
+                Id = 0,
                 UserName = ""
             };
 
