@@ -1,5 +1,4 @@
-﻿using ClienteNet6.Server.Context;
-using ClienteNet6.Server.Services;
+﻿using ClienteNet6.Server.Services;
 using ClienteNet6.Server.Services.Exceptions;
 using ClienteNet6.Shared.Dto;
 using Microsoft.AspNetCore.Authorization;
@@ -30,7 +29,7 @@ namespace ClienteNet6.Server.Controllers
             }
             catch
             {
-                return BadRequest("Erro ao coletar veículos");
+                return BadRequest("Erro ao coletar veículo");
             }
         }
 
@@ -104,7 +103,7 @@ namespace ClienteNet6.Server.Controllers
             }
             catch
             {
-                return BadRequest("Erro ao inserir veículo.");
+                return BadRequest("Erro ao deletar veículo.");
             }
         }
     }

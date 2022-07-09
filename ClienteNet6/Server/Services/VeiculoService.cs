@@ -6,12 +6,48 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClienteNet6.Server.Services
 {
+    /// <summary>
+    /// Service manage veiculo model
+    /// </summary>
     public interface IVeiculoService
     {
+        /// <summary>
+        /// Add Veiculo async
+        /// </summary>
+        /// <param name="veiculo">new model</param>
+        /// <returns>async</returns>
+        /// <exception cref="ConflictPostException"></exception>
         Task AddVeiculo(VeiculoDto veiculo);
+
+        /// <summary>
+        /// Get Veiculo async
+        /// </summary>
+        /// <param name="renavam">Id</param>
+        /// <returns>async <see cref="VeiculoDto"/> or null</returns>
         Task<VeiculoDto> GetVeiculo(int renavam);
+
+        /// <summary>
+        /// Get Enumerable Veiculo async
+        /// </summary>
+        /// <returns>async <see cref="IEnumerable{VeiculoDto}"/>, can have be zero count</returns>
         Task<IEnumerable<VeiculoDto>> GetVeiculo();
+
+        /// <summary>
+        /// Delete Veiculo async
+        /// </summary>
+        /// <param name="renavam">id</param>
+        /// <returns>async</returns>
+        /// <exception cref="NoContentException"></exception>
         Task DeleteVeiculo(int renavam);
+
+        /// <summary>
+        /// Update Veiculo async
+        /// </summary>
+        /// <param name="renavam">id</param>
+        /// <param name="veiculo">New model</param>
+        /// <returns>async</returns>
+        /// <exception cref="NoContentException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         Task UpdateVeiculo(int renavam, VeiculoDto veiculo);
     }
 
@@ -81,7 +117,7 @@ namespace ClienteNet6.Server.Services
                 (from userVeiculo in _context.UsuarioVeiculos.AsNoTracking()
                  join veiculos in _context.Veiculos.AsNoTracking() on userVeiculo.IdVeiculo equals veiculos.Renavam
                  where userVeiculo.IdUser.Equals(user.Id)
-                 select veiculos).Where(veiculo => veiculo.Renavam.Equals(renavam)).AsNoTracking().FirstOrDefaultAsync();
+                 select veiculos).Where(veiculo => veiculo.Renavam.Equals(renavam)).AsNoTracking().FirstOrDefaultAsync().ConfigureAwait(false);
 
             if (veiculoDb is null)
                 throw new NoContentException($"Veiculo com renavam={renavam} não está cadastrado no usuário={user.Email}.");
@@ -149,7 +185,7 @@ namespace ClienteNet6.Server.Services
                 (from userVeiculo in _context.UsuarioVeiculos.AsNoTracking()
                  join veiculos in _context.Veiculos.AsNoTracking() on userVeiculo.IdVeiculo equals veiculos.Renavam
                  where userVeiculo.IdUser.Equals(user.Id)
-                 select veiculos).Where(veiculo => veiculo.Renavam.Equals(renavam)).AsNoTracking().FirstOrDefaultAsync();
+                 select veiculos).Where(veiculo => veiculo.Renavam.Equals(renavam)).AsNoTracking().FirstOrDefaultAsync().ConfigureAwait(false);
 
             if (veiculoDb is null)
                 throw new NoContentException();

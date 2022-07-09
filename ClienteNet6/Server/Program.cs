@@ -24,7 +24,8 @@ var builder = WebApplication.CreateBuilder(args);
         .AddScoped<ILocalStorageService, LocalStorageService>()
         .AddScoped<ITokenService, TokenService>()
         .AddScoped<IUserService, UserService>()
-        .AddScoped<IVeiculoService, VeiculoService>();
+        .AddScoped<IVeiculoService, VeiculoService>()
+        .AddScoped<IInfracaoService, InfracaoService>();
 
     #endregion
 
