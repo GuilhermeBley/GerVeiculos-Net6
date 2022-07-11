@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Auth\**" />
+    <Content Remove="Auth\**" />
+    <EmbeddedResource Remove="Auth\**" />
+    <None Remove="Auth\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.5" />
@@ -23,10 +30,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Client\ClienteNet6.Client.csproj" />
     <ProjectReference Include="..\Shared\ClienteNet6.Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Auth\" />
   </ItemGroup>
 
 

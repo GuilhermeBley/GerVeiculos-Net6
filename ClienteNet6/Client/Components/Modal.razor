@@ -1,13 +1,12 @@
 ﻿@if (Show)
 {
     <!-- Modal -->
-    <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+    <div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8);" aria-modal="true" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitle">@ModalTitle</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="@(()=>OnClose.InvokeAsync())">
-                        <span aria-hidden="true">&times;</span>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" onclick="@(()=>OnClose.InvokeAsync())">
                     </button>
                 </div>
                 <div class="modal-body">
