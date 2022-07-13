@@ -74,7 +74,7 @@ namespace ClienteNet6.Server.Services
         {
             var user = _userService.GetUser();
 
-            if (_context.Veiculos.AsNoTracking().Where(veiculo => veiculo.Renavam.Equals(veiculo.Renavam)).Any())
+            if (_context.Veiculos.AsNoTracking().Where(v => v.Renavam.Equals(veiculo.Renavam) || v.Chassi.Equals(veiculo.Chassi)).Any())
                 throw new ConflictPostException("Veiculo já existe.");
 
             using var transaction = _context.Database.BeginTransaction();
@@ -150,7 +150,8 @@ namespace ClienteNet6.Server.Services
                      Chassi = veiculos.Chassi,
                      Cor = veiculos.Cor,
                      Placa = veiculos.Placa,
-                     Renavam = veiculos.Renavam
+                     Renavam = veiculos.Renavam,
+                     Modelo = veiculos.Modelo
                  }).AsNoTracking().FirstOrDefaultAsync().ConfigureAwait(false);
             return obj;
         }
@@ -169,7 +170,8 @@ namespace ClienteNet6.Server.Services
                      Chassi = veiculos.Chassi,
                      Cor = veiculos.Cor,
                      Placa = veiculos.Placa,
-                     Renavam = veiculos.Renavam
+                     Renavam = veiculos.Renavam,
+                     Modelo = veiculos.Modelo
                  }).AsNoTracking().ToListAsync().ConfigureAwait(false);
         }
 

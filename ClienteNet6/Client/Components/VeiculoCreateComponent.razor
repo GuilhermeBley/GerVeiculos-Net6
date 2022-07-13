@@ -7,9 +7,14 @@
                 <EditForm Model="@VeiculoDto" OnValidSubmit="@(()=>OnValid.InvokeAsync(VeiculoDto))">
                     <DataAnnotationsValidator />
                     <div class="form-group">
-                        <label for="renavam">Renavam</label>
-                        <InputNumber id="renavam" @bind-Value=@VeiculoDto.Renavam class="form-control" />
+                        <label for="Renavam">Renavam</label>
+                        <InputNumber id="Renavam" @bind-Value=@VeiculoDto.Renavam class="form-control" />
                         <ValidationMessage For="@(()=>VeiculoDto.Renavam)" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Placa">Placa</label>
+                        <InputText id="Placa" @bind-Value=@VeiculoDto.Placa class="form-control"/>
+                        <ValidationMessage For="@(()=>VeiculoDto.Placa)" />
                     </div>
                     <div class="form-group">
                         <label for="Chassi">Chassi</label>
@@ -28,7 +33,7 @@
                     </div>
                     <div class="my-5 flex-row-reverse">
                         <button type="submit" class="btn btn-primary">
-                            Criar
+                            Adicionar veículo
                         </button>
                     </div>
                 </EditForm>

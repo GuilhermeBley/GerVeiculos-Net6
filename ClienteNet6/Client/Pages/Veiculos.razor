@@ -39,7 +39,7 @@
                     <td>@veiculoDto.Cor</td>
                     <td>@veiculoDto.Modelo</td>
                     <td>
-                        <button type="button" class="btn btn-outline-secondary" title="Editar" onclick="@(async ()=> await OpenEditRenavam(veiculoDto.Renavam))">
+                        <button type="button" class="btn btn-outline-secondary" title="Editar" onclick="@(()=>OpenEditRenavam(veiculoDto.Renavam))">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" fill="currentColor" height="16" class="bi bi-pencil" viewBox="0 0 16 16">
                                 <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z" />
                             </svg>
@@ -61,12 +61,12 @@
 
 @*Veiculos add*@
 <Modal ModalTitle="Adicionar veículo" Show="@IsAddRenavam" OnClose="@CloseAddRenavam" ErrorList="ErrorListModal">
-    <VeiculoCreateComponent OnValid="@CreateVeiculos"></VeiculoCreateComponent>
+    <VeiculoCreateComponent OnValid="@CreateVeiculo"></VeiculoCreateComponent>
 </Modal>
 
 @*Veiculos Edit*@
 <Modal ModalTitle="Editar veículo" Show="@IsEditRenavam" OnClose="@CloseEditRenavam" ErrorList="ErrorListModal">
-    <VeiculoUpdateComponent VeiculoDtoCurr="@EditRenavam" OnValid="@UpdateVeiculos"></VeiculoUpdateComponent>
+    <VeiculoUpdateComponent VeiculoDtoCurr="@EditRenavam" OnValid="@UpdateVeiculo"></VeiculoUpdateComponent>
 </Modal>
 
 @*Veiculos Remove*@
@@ -120,6 +120,10 @@
     {
         try
         {
+            Loading = true;
+
+            ErrorListModal.Clear();
+
             if (RemoveRenavam is null)
             {
                 ErrorListModal.Add($"Falha em excluir veículo com renavam.");
@@ -159,11 +163,15 @@
     /// </summary>
     /// <param name="veiculoDto">model</param>
     /// <returns>task async</returns>
-    private async Task UpdateVeiculos(VeiculoDto veiculoDto)
+    private async Task UpdateVeiculo(VeiculoDto veiculoDto)
     {
         try
         {
-            var response = await Client.PutAsJsonAsync("api/veiculo", veiculoDto);
+            Loading = true;
+
+            ErrorListModal.Clear();
+
+            var response = await Client.PutAsJsonAsync($"api/veiculo/{veiculoDto.Renavam}", veiculoDto);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -179,6 +187,8 @@
 
             SucessList.Add($"Veículo com renavam {veiculoDto.Renavam} alterado com sucesso.");
 
+            VeiculoDtos = await GetVeiculoDtos();
+
             CloseEditRenavam();
         }
         finally
@@ -192,17 +202,21 @@
     /// </summary>
     /// <param name="veiculoDto">model</param>
     /// <returns>task async</returns>
-    private async Task CreateVeiculos(VeiculoDto veiculoDto)
+    private async Task CreateVeiculo(VeiculoDto veiculoDto)
     {
         try
         {
+            Loading = true;
+
+            ErrorListModal.Clear();
+
             var response = await Client.PostAsJsonAsync("api/veiculo", veiculoDto);
 
             if (!response.IsSuccessStatusCode)
             {
                 if (response.StatusCode.Equals(HttpStatusCode.Conflict))
                 {
-                    ErrorListModal.Add($"Veículo com renavam {veiculoDto.Renavam} já existe.");
+                    ErrorListModal.Add($"Veículo com renavam {veiculoDto.Renavam} e/ou chassi {veiculoDto.Chassi} já existe.");
                     return;
                 }
 
@@ -211,6 +225,8 @@
             }
 
             SucessList.Add($"Veículo com renavam {veiculoDto.Renavam} adicionado com sucesso.");
+
+            VeiculoDtos = await GetVeiculoDtos();
 
             CloseAddRenavam();
         }
@@ -225,24 +241,9 @@
     /// </summary>
     /// <param name="renavam">Identifier</param>
     /// <returns>async</returns>
-    private async Task SetEditVeiculo(int renavam)
+    private void SetEditVeiculo(int renavam)
     {
-        try
-        {
-            var response = await Client.GetAsync($"api/veiculo?renavam={renavam}");
-
-            if (!response.StatusCode.Equals(HttpStatusCode.OK))
-            {
-                ErrorListModal.Add("Falha em coletar veículo.");
-                return;
-            }
-
-            EditRenavam = await response.Content.ReadFromJsonAsync<VeiculoDto?>();
-        }
-        finally
-        {
-            Loading = false;
-        }
+        EditRenavam = VeiculoDtos.FirstOrDefault(p => p.Renavam.Equals(renavam));
     }
 
     #region Modal
@@ -271,9 +272,16 @@
         StateHasChanged();
     }
 
-    private async Task OpenEditRenavam(int renavam)
+    private void OpenEditRenavam(int renavam)
     {
-        await SetEditVeiculo(renavam);
+        SetEditVeiculo(renavam);
+
+        if (EditRenavam is null)
+        {
+            ErrorList.Add($"Falha em coletar veículo {renavam} para atualização, atualize a página e tente novamente.");
+            return;
+        }
+
         ErrorListModal.Clear();
         SucessList.Clear();
         StateHasChanged();
