@@ -1,0 +1,46 @@
+﻿@using ClienteNet6.Shared.Dto;
+
+<div class="app-container ">
+    <div class="col-md-6 offset-md-3 mt-5">
+        <div class="card">
+            <div class="card-body">
+                <EditForm Model="@VeiculoDto" OnValidSubmit="@(()=>OnValid.InvokeAsync(VeiculoDto))">
+                    <DataAnnotationsValidator />
+                    <div class="form-group">
+                        <label for="renavam">Renavam</label>
+                        <InputNumber id="renavam" @bind-Value=@VeiculoDto.Renavam class="form-control" />
+                        <ValidationMessage For="@(()=>VeiculoDto.Renavam)" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Chassi">Chassi</label>
+                        <InputText id="Chassi" @bind-Value=@VeiculoDto.Chassi class="form-control"/>
+                        <ValidationMessage For="@(()=>VeiculoDto.Chassi)" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Modelo">Modelo</label>
+                        <InputText id="Modelo" @bind-Value=@VeiculoDto.Modelo class="form-control" />
+                        <ValidationMessage For="@(()=>VeiculoDto.Modelo)" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Cor">Cor</label>
+                        <InputText id="Cor" @bind-Value=@VeiculoDto.Cor class="form-control" />
+                        <ValidationMessage For="@(()=>VeiculoDto.Cor)" />
+                    </div>
+                    <div class="my-5 flex-row-reverse">
+                        <button type="submit" class="btn btn-primary">
+                            Criar
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public EventCallback<VeiculoDto> OnValid { get; set; }
+
+    private VeiculoDto VeiculoDto = new();
+}

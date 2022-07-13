@@ -2,7 +2,8 @@
 {
     <!-- Modal -->
     <div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8);" aria-modal="true" role="dialog">
-        <div class="modal-dialog" role="document">
+        <ErrorComponent Errors="ErrorList"></ErrorComponent>
+        <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitle">@ModalTitle</h5>
@@ -27,6 +28,9 @@
 
     [Parameter]
     public bool Show { get; set; }
+
+    [Parameter]
+    public IEnumerable<string> ErrorList { get; set; } = new List<string>();
 
     [Parameter]
     public EventCallback OnClose { get; set; }
