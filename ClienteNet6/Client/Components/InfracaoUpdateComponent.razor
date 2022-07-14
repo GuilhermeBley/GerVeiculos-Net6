@@ -14,7 +14,7 @@
                     </div>
                     <div class="form-group">
                         <label for="Renavam">Renavam</label>
-                        <InputSelect id="Renavam" @bind-Value="@InfracaoDto.Renavam" class="form-control" >
+                        <InputSelect id="Renavam" @bind-Value="@InfracaoDto.Renavam" class="form-control">
                             @foreach (var vei in ListVeiculo)
                             {
                                 <option value="@vei.Renavam">@GetIdentifierVeiculo(vei)</option>
@@ -29,12 +29,12 @@
                     </div>
                     <div class="form-group">
                         <label for="Emissao" class="p-3">Emissao</label>
-                        <InputDate @bind-Value:culture="pt-BR" @bind-Value:format="dd/MM/yyyy hh:mm:ss" @bind-Value="@InfracaoDto.Emissao" ParsingErrorMessage="Formato de data inválida. Tente o formato 'dd/mm/aaaa'" />
+                        <InputDate Type="InputDateType.DateTimeLocal" @bind-Value:culture="pt-BR" @bind-Value:format="dd/MM/yyyy hh:mm:ss" @bind-Value="@InfracaoDto.Emissao" ParsingErrorMessage="Formato de data inválida. Tente o formato 'dd/mm/aaaa'" />
                         <ValidationMessage For="@(()=>InfracaoDto.Emissao)" />
                     </div>
                     <div class="form-group">
                         <label for="Validade" class="p-3">Validade</label>
-                        <InputDate @bind-Value:culture="pt-BR" @bind-Value:format="dd/MM/yyyy hh:mm:ss" @bind-Value="@InfracaoDto.Validade" ParsingErrorMessage="Formato de data inválida. Tente o formato 'dd/mm/aaaa'" />
+                        <InputDate Type="InputDateType.DateTimeLocal" @bind-Value:culture="pt-BR" @bind-Value:format="dd/MM/yyyy hh:mm:ss" @bind-Value="@InfracaoDto.Validade" ParsingErrorMessage="Formato de data inválida. Tente o formato 'dd/mm/aaaa'" />
                         <ValidationMessage For="@(()=>InfracaoDto.Validade)" />
                     </div>
                     <div class="my-5 flex-row-reverse">
@@ -87,31 +87,31 @@
 
     private bool IsValidSubmit()
     {
-    Errors.Clear();
+        Errors.Clear();
 
-    if (InfracaoDtoCurr is null)
-        return false;
+        if (InfracaoDtoCurr is null)
+            return false;
 
-    bool valid = false;
+        bool valid = false;
 
-    if (InfracaoDto.Renavam != InfracaoDtoCurr.Renavam)
-        valid = true;
-    if (InfracaoDto.Emissao != InfracaoDtoCurr.Emissao)
-        valid = true;
-    if (InfracaoDto.Validade != InfracaoDtoCurr.Validade)
-        valid = true;
-    if (InfracaoDto.Local != InfracaoDtoCurr.Local)
-        valid = true;
+        if (InfracaoDto.Renavam != InfracaoDtoCurr.Renavam)
+            valid = true;
+        if (InfracaoDto.Emissao != InfracaoDtoCurr.Emissao)
+            valid = true;
+        if (InfracaoDto.Validade != InfracaoDtoCurr.Validade)
+            valid = true;
+        if (InfracaoDto.Local != InfracaoDtoCurr.Local)
+            valid = true;
 
-    if (valid)
-    {
-        OnValid.InvokeAsync(InfracaoDto);
-    }
-    else
-    {
-        Errors.Add($"Nenhuma alteração foi feita na infração {InfracaoDto.Ait}.");
-    }
+        if (valid)
+        {
+            OnValid.InvokeAsync(InfracaoDto);
+        }
+        else
+        {
+            Errors.Add($"Nenhuma alteração foi feita na infração {InfracaoDto.Ait}.");
+        }
 
-    return valid;
+        return valid;
     }
 }
