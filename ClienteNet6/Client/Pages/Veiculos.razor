@@ -103,7 +103,86 @@
         {
             Loading = true;
             await base.OnInitializedAsync();
-            VeiculoDtos = await GetVeiculoDtos();
+            VeiculoDtos = await GetVeiculos();
+        }
+        finally
+        {
+            Loading = false;
+        }
+    }
+
+    
+    /// <summary>
+    /// create veiculo async and close modal
+    /// </summary>
+    /// <param name="veiculoDto">model</param>
+    /// <returns>task async</returns>
+    private async Task CreateVeiculo(VeiculoDto veiculoDto)
+    {
+        try
+        {
+            Loading = true;
+
+            ErrorListModal.Clear();
+
+            var response = await Client.PostAsJsonAsync("api/veiculo", veiculoDto);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                if (response.StatusCode.Equals(HttpStatusCode.Conflict))
+                {
+                    ErrorListModal.Add($"Veículo com renavam {veiculoDto.Renavam} e/ou chassi {veiculoDto.Chassi} já existe.");
+                    return;
+                }
+
+                ErrorListModal.Add("Erro ao adicionar veículo.");
+                return;
+            }
+
+            SucessList.Add($"Veículo com renavam {veiculoDto.Renavam} adicionado com sucesso.");
+
+            VeiculoDtos = await GetVeiculos();
+
+            CloseAddRenavam();
+        }
+        finally
+        {
+            Loading = false;
+        }
+    }
+    
+    /// <summary>
+    /// update veiculo async and close modal
+    /// </summary>
+    /// <param name="veiculoDto">model</param>
+    /// <returns>task async</returns>
+    private async Task UpdateVeiculo(VeiculoDto veiculoDto)
+    {
+        try
+        {
+            Loading = true;
+
+            ErrorListModal.Clear();
+
+            var response = await Client.PutAsJsonAsync($"api/veiculo/{veiculoDto.Renavam}", veiculoDto);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ErrorListModal.Add("Erro ao atualizar veículo.");
+                return;
+            }
+
+            if (response.StatusCode.Equals(HttpStatusCode.NoContent))
+            {
+                ErrorListModal.Add($"Veículo com renavam {veiculoDto.Renavam} não existe.");
+                return;
+            }
+
+            SucessList.Add($"Veículo com renavam {veiculoDto.Renavam} alterado com sucesso.");
+
+            VeiculoDtos = await GetVeiculos();
+
+            CloseEditRenavam();
         }
         finally
         {
@@ -150,85 +229,7 @@
 
             CloseDeleteRenavam();
 
-            VeiculoDtos = await GetVeiculoDtos();
-        }
-        finally
-        {
-            Loading = false;
-        }
-    }
-
-    /// <summary>
-    /// update veiculo async and close modal
-    /// </summary>
-    /// <param name="veiculoDto">model</param>
-    /// <returns>task async</returns>
-    private async Task UpdateVeiculo(VeiculoDto veiculoDto)
-    {
-        try
-        {
-            Loading = true;
-
-            ErrorListModal.Clear();
-
-            var response = await Client.PutAsJsonAsync($"api/veiculo/{veiculoDto.Renavam}", veiculoDto);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                ErrorListModal.Add("Erro ao atualizar veículo.");
-                return;
-            }
-
-            if (response.StatusCode.Equals(HttpStatusCode.NoContent))
-            {
-                ErrorListModal.Add($"Veículo com renavam {veiculoDto.Renavam} não existe.");
-                return;
-            }
-
-            SucessList.Add($"Veículo com renavam {veiculoDto.Renavam} alterado com sucesso.");
-
-            VeiculoDtos = await GetVeiculoDtos();
-
-            CloseEditRenavam();
-        }
-        finally
-        {
-            Loading = false;
-        }
-    }
-
-    /// <summary>
-    /// create veiculo async and close modal
-    /// </summary>
-    /// <param name="veiculoDto">model</param>
-    /// <returns>task async</returns>
-    private async Task CreateVeiculo(VeiculoDto veiculoDto)
-    {
-        try
-        {
-            Loading = true;
-
-            ErrorListModal.Clear();
-
-            var response = await Client.PostAsJsonAsync("api/veiculo", veiculoDto);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                if (response.StatusCode.Equals(HttpStatusCode.Conflict))
-                {
-                    ErrorListModal.Add($"Veículo com renavam {veiculoDto.Renavam} e/ou chassi {veiculoDto.Chassi} já existe.");
-                    return;
-                }
-
-                ErrorListModal.Add("Erro ao adicionar veículo.");
-                return;
-            }
-
-            SucessList.Add($"Veículo com renavam {veiculoDto.Renavam} adicionado com sucesso.");
-
-            VeiculoDtos = await GetVeiculoDtos();
-
-            CloseAddRenavam();
+            VeiculoDtos = await GetVeiculos();
         }
         finally
         {
@@ -305,7 +306,7 @@
 
     #endregion
 
-    private async Task<IEnumerable<VeiculoDto>> GetVeiculoDtos()
+    private async Task<IEnumerable<VeiculoDto>> GetVeiculos()
     {
         var response = await Client.GetAsync("api/veiculo/all");
 

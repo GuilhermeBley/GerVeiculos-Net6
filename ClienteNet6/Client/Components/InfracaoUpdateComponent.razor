@@ -1,0 +1,117 @@
+﻿@using ClienteNet6.Shared.Dto;
+
+<div class="app-container ">
+    <div class="col-md-6 offset-md-3 mt-5">
+        <div class="card">
+            <div class="card-body">
+                <ErrorComponent Errors="Errors"></ErrorComponent>
+                <EditForm Model="@InfracaoDto" OnValidSubmit="@(()=>IsValidSubmit())">
+                    <DataAnnotationsValidator />
+                    <div class="form-group">
+                        <label for="Ait">Ait</label>
+                        <InputText id="Ait" @bind-Value=@InfracaoDtoCurr.Ait class="form-control" placeholder="@InfracaoDtoCurr.Ait" readonly />
+                        <ValidationMessage For="@(()=>InfracaoDto.Ait)" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Renavam">Renavam</label>
+                        <InputSelect id="Renavam" @bind-Value="@InfracaoDto.Renavam" class="form-control" >
+                            @foreach (var vei in ListVeiculo)
+                            {
+                                <option value="@vei.Renavam">@GetIdentifierVeiculo(vei)</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(()=>InfracaoDto.Renavam)" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Local">Local</label>
+                        <InputText id="Local" @bind-Value=@InfracaoDto.Local class="form-control" />
+                        <ValidationMessage For="@(()=>InfracaoDto.Local)" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Emissao" class="p-3">Emissao</label>
+                        <InputDate @bind-Value:culture="pt-BR" @bind-Value:format="dd/MM/yyyy hh:mm:ss" @bind-Value="@InfracaoDto.Emissao" ParsingErrorMessage="Formato de data inválida. Tente o formato 'dd/mm/aaaa'" />
+                        <ValidationMessage For="@(()=>InfracaoDto.Emissao)" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Validade" class="p-3">Validade</label>
+                        <InputDate @bind-Value:culture="pt-BR" @bind-Value:format="dd/MM/yyyy hh:mm:ss" @bind-Value="@InfracaoDto.Validade" ParsingErrorMessage="Formato de data inválida. Tente o formato 'dd/mm/aaaa'" />
+                        <ValidationMessage For="@(()=>InfracaoDto.Validade)" />
+                    </div>
+                    <div class="my-5 flex-row-reverse">
+                        <button type="submit" class="btn btn-primary">
+                            Adicionar infração
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public EventCallback<InfracaoDto> OnValid { get; set; }
+
+    [Parameter]
+    public IEnumerable<VeiculoDto> ListVeiculo { get; set; } = new List<VeiculoDto>();
+
+    [Parameter]
+    public InfracaoDto InfracaoDtoCurr { get; set; } = new();
+
+    private InfracaoDto InfracaoDto = new();
+
+    private List<string> Errors = new();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        if (InfracaoDtoCurr is null)
+            return;
+
+        InfracaoDto.Renavam = InfracaoDtoCurr.Renavam;
+        InfracaoDto.Ait = InfracaoDtoCurr.Ait;
+        InfracaoDto.Emissao = InfracaoDtoCurr.Emissao;
+        InfracaoDto.Validade = InfracaoDtoCurr.Validade;
+        InfracaoDto.Local = InfracaoDtoCurr.Local;
+
+    }
+
+    private string GetIdentifierVeiculo(VeiculoDto vei)
+    {
+        if (vei is null)
+            return string.Empty;
+        return $"Renavam={vei.Renavam} Placa={vei.Placa}";
+    }
+
+    private bool IsValidSubmit()
+    {
+    Errors.Clear();
+
+    if (InfracaoDtoCurr is null)
+        return false;
+
+    bool valid = false;
+
+    if (InfracaoDto.Renavam != InfracaoDtoCurr.Renavam)
+        valid = true;
+    if (InfracaoDto.Emissao != InfracaoDtoCurr.Emissao)
+        valid = true;
+    if (InfracaoDto.Validade != InfracaoDtoCurr.Validade)
+        valid = true;
+    if (InfracaoDto.Local != InfracaoDtoCurr.Local)
+        valid = true;
+
+    if (valid)
+    {
+        OnValid.InvokeAsync(InfracaoDto);
+    }
+    else
+    {
+        Errors.Add($"Nenhuma alteração foi feita na infração {InfracaoDto.Ait}.");
+    }
+
+    return valid;
+    }
+}

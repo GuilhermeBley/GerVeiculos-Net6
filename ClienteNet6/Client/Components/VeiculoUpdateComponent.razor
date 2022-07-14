@@ -48,7 +48,7 @@
     public EventCallback<VeiculoDto> OnValid { get; set; }
 
     [Parameter]
-    public VeiculoDto? VeiculoDtoCurr { get; set; }
+    public VeiculoDto? VeiculoDtoCurr { get; set; } = new();
 
     private VeiculoDto VeiculoDto = new();
     private List<string> Errors = new();

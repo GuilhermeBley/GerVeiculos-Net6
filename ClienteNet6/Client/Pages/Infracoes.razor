@@ -1,7 +1,333 @@
 ﻿@page "/infracoes"
+@using ClienteNet6.Client.Components
+@using ClienteNet6.Shared.Dto
+
+@inject HttpClient Client;
+
+<OkComponent SucessMessages="@SucessList"></OkComponent>
+<ErrorComponent Errors="@ErrorList"></ErrorComponent>
+<LoadComponent Show="@Loading"></LoadComponent>
 
 <h3>Infracoes</h3>
 
-@code {
+<div class="my-xxl-4">
+    <button type="button" class="btn btn-primary" onclick="@(()=>OpenAddInfracao())">Adicionar nova infração.</button>
+</div>
 
+@*Veiculos show*@
+@if (InfracoesDto.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Renavam</th>
+                <th scope="col">Ait</th>
+                <th scope="col">Local</th>
+                <th scope="col">Emissao</th>
+                <th scope="col">Validade</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        @foreach (var infracaoDto in InfracoesDto)
+        {
+            <tbody>
+                <tr>
+                    <td>@infracaoDto.Renavam</td>
+                    <td>@infracaoDto.Ait</td>
+                    <td>@infracaoDto.Local</td>
+                    <td>@infracaoDto.Emissao.ToString("dd/MM/yyyy hh:mm:ss")</td>
+                    <td>@infracaoDto.Validade.ToString("dd/MM/yyyy hh:mm:ss")</td>
+                    <td>
+                        <button type="button" class="btn btn-outline-secondary" title="Editar" onclick="@(()=>OpenEditInfracao(infracaoDto.Ait))">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" fill="currentColor" height="16" class="bi bi-pencil" viewBox="0 0 16 16">
+                                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z" />
+                            </svg>
+                        </button>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-outline-danger" title="Excluir" onclick="@(()=>OpenRemoveInfracao(infracaoDto.Ait))">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" fill="currentColor" height="16" class="bi bi-x-square" viewBox="0 0 16 16">
+                                <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        }
+    </table>
+}
+
+@*Infracoes add*@
+<Modal ModalTitle="Adicionar infração" Show="@IsAddInfracao" OnClose="@CloseAddInfracao" ErrorList="ErrorListModal">
+    <InfracaoCreateComponent ListVeiculo="@VeiculosDto" OnValid="@CreateInfracao"></InfracaoCreateComponent>
+</Modal>
+
+@*Infracoes Edit*@
+<Modal ModalTitle="Editar infração" Show="@IsEditInfracao" OnClose="@CloseEditInfracao" ErrorList="ErrorListModal">
+    <InfracaoUpdateComponent ListVeiculo="@VeiculosDto" InfracaoDtoCurr="@EditInfracao" OnValid="@UpdateInfracao"></InfracaoUpdateComponent>
+</Modal>
+
+@*Infracoes Remove*@
+<Modal ModalTitle="Remover infração" Show="@IsRemoveInfracao" OnClose="@CloseDeleteInfracao" ErrorList="ErrorListModal">
+    <span>Deseja remover a infração?</span>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="@(()=>CloseDeleteInfracao())">Cancelar</button>
+        <button type="button" class="btn btn-primary" onclick="@(async()=>await DeleteInfracao())">Remover</button>
+    </div>
+</Modal>
+
+@code {
+    private List<string> ErrorList { get; } = new List<string>();
+    private List<string> SucessList { get; } = new List<string>();
+    private List<string> ErrorListModal { get; } = new();
+    private IEnumerable<InfracaoDto> InfracoesDto { get; set; } = new List<InfracaoDto>();
+    private IEnumerable<VeiculoDto> VeiculosDto { get; set; } = new List<VeiculoDto>();
+    private bool Loading { get; set; }
+
+    // Edit
+    private InfracaoDto? EditInfracao { get; set; } = null;
+    private bool IsEditInfracao => EditInfracao is not null;
+
+    // Remove
+    private string? RemoveInfracao { get; set; } = null;
+    private bool IsRemoveInfracao => RemoveInfracao is not null;
+
+    // Add
+    private bool IsAddInfracao { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Loading = true;
+            await base.OnInitializedAsync();
+            InfracoesDto = await GetInfracoes();
+            VeiculosDto = await GetVeiculos();
+        }
+        finally
+        {
+            Loading = false;
+        }
+    }
+
+    private async Task<IEnumerable<InfracaoDto>> GetInfracoes()
+    {
+        var response = await Client.GetAsync("api/infracao/all");
+
+        // Errors
+        if (!response.IsSuccessStatusCode)
+        {
+            if (response.StatusCode.Equals(HttpStatusCode.BadRequest))
+            {
+                var message = await response.Content.ReadFromJsonAsync<string>();
+
+                ErrorList.Add(message ?? "Falha ao coletar infrações.");
+                return new List<InfracaoDto>();
+            }
+
+            ErrorList.Add("Falha ao coletar infrações.");
+            return new List<InfracaoDto>();
+        }
+
+        // Veiculos
+        if (response.StatusCode.Equals(HttpStatusCode.OK))
+            return await response.Content.ReadFromJsonAsync<IEnumerable<InfracaoDto>>() ?? new List<InfracaoDto>();
+
+        return new List<InfracaoDto>();
+    }
+
+    private async Task<IEnumerable<VeiculoDto>> GetVeiculos()
+    {
+        var response = await Client.GetAsync("api/veiculo/all");
+
+        // Errors
+        if (!response.IsSuccessStatusCode)
+        {
+            if (response.StatusCode.Equals(HttpStatusCode.BadRequest))
+            {
+                var message = await response.Content.ReadFromJsonAsync<string>();
+
+                ErrorList.Add(message ?? "Falha ao coletar veículos.");
+                return new List<VeiculoDto>();
+            }
+
+            ErrorList.Add("Falha ao coletar veículos");
+            return new List<VeiculoDto>();
+        }
+
+        // Veiculos
+        if (response.StatusCode.Equals(HttpStatusCode.OK))
+            return await response.Content.ReadFromJsonAsync<IEnumerable<VeiculoDto>>() ?? new List<VeiculoDto>();
+
+        return new List<VeiculoDto>();
+    }
+
+    private async Task CreateInfracao(InfracaoDto infracaoDto)
+    {
+        try
+        {
+            Loading = true;
+
+            ErrorListModal.Clear();
+
+            var response = await Client.PostAsJsonAsync("api/infracao", infracaoDto);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                if (response.StatusCode.Equals(HttpStatusCode.Conflict))
+                {
+                    ErrorListModal.Add($"Infração com AIT {infracaoDto.Ait}.");
+                    return;
+                }
+
+                ErrorListModal.Add("Erro ao adicionar infração.");
+                return;
+            }
+
+            SucessList.Add($"Veículo com renavam {infracaoDto.Ait} adicionado com sucesso.");
+
+            InfracoesDto = await GetInfracoes();
+
+            CloseAddInfracao();
+        }
+        finally
+        {
+            Loading = false;
+        }
+    }
+
+    private async Task UpdateInfracao(InfracaoDto infracaoDto)
+    {
+        try
+        {
+            Loading = true;
+
+            ErrorListModal.Clear();
+
+            var response = await Client.PutAsJsonAsync($"api/infracao/{infracaoDto.Ait}", infracaoDto);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ErrorListModal.Add("Erro ao atualizar infração.");
+                return;
+            }
+
+            if (response.StatusCode.Equals(HttpStatusCode.NoContent))
+            {
+                ErrorListModal.Add($"Infração com AIT {infracaoDto.Ait} não existe.");
+                return;
+            }
+
+            SucessList.Add($"Infração com AIT {infracaoDto.Ait} alterado com sucesso.");
+
+            InfracoesDto = await GetInfracoes();
+
+            CloseEditInfracao();
+        }
+        finally
+        {
+            Loading = false;
+        }
+    }
+
+    private async Task DeleteInfracao()
+    {
+        try
+        {
+            Loading = true;
+
+            ErrorListModal.Clear();
+
+            if (string.IsNullOrEmpty(RemoveInfracao))
+            {
+                ErrorListModal.Add($"Falha em excluir veículo com renavam.");
+                return;
+            }
+
+            var response = await Client.DeleteAsync($"api/infracao/{RemoveInfracao}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ErrorListModal.Add("Erro ao excluir infração, atualize a página para verificar as alterações.");
+                return;
+            }
+
+            if (response.StatusCode.Equals(HttpStatusCode.NoContent))
+            {
+                ErrorListModal.Add($"Infração com AIT {RemoveInfracao} não existe.");
+                return;
+            }
+
+            SucessList.Add($"Infração com AIT {RemoveInfracao} deletado com sucesso.");
+
+            CloseDeleteInfracao();
+
+            InfracoesDto = await GetInfracoes();
+        }
+        finally
+        {
+            Loading = false;
+        }
+    }
+
+    #region Modal
+
+    private void CloseEditInfracao()
+    {
+        EditInfracao = null;
+        ErrorListModal.Clear();
+        SucessList.Clear();
+        StateHasChanged();
+    }
+
+    private void CloseDeleteInfracao()
+    {
+        RemoveInfracao = null;
+        ErrorListModal.Clear();
+        SucessList.Clear();
+        StateHasChanged();
+    }
+
+    private void CloseAddInfracao()
+    {
+        IsAddInfracao = false;
+        ErrorListModal.Clear();
+        SucessList.Clear();
+        StateHasChanged();
+    }
+
+    private void OpenEditInfracao(string ait)
+    {
+        EditInfracao = InfracoesDto.FirstOrDefault(p => p.Ait.Equals(ait));
+
+        if (EditInfracao is null)
+        {
+            ErrorList.Add($"Falha em coletar infração {ait} para atualização, atualize a página e tente novamente.");
+            return;
+        }
+
+        ErrorListModal.Clear();
+        SucessList.Clear();
+        StateHasChanged();
+    }
+
+    private void OpenRemoveInfracao(string ait)
+    {
+        RemoveInfracao = ait;
+        ErrorListModal.Clear();
+        SucessList.Clear();
+        StateHasChanged();
+    }
+
+    private void OpenAddInfracao()
+    {
+        IsAddInfracao = true;
+        ErrorListModal.Clear();
+        SucessList.Clear();
+        StateHasChanged();
+    }
+
+    #endregion
 }
