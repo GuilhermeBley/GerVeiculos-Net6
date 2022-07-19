@@ -41,6 +41,7 @@ namespace ClienteNet6.Server.Context
         public DbSet<Veiculo> Veiculos { get; set; }
         public DbSet<Infracao> Infracoes { get; set; }
         public DbSet<UsuarioVeiculo> UsuarioVeiculos { get; set; }
+        public DbSet<Log> Logs { get; set; }
 
         public AppGerVeiculosContext(IConfiguration configurantion, [System.Diagnostics.CodeAnalysis.NotNull] DbContextOptions options) : base(options)
         {
@@ -55,8 +56,6 @@ namespace ClienteNet6.Server.Context
                 _Configuration.GetConnectionString("DbGerVeiculos"),
                 ServerVersion.AutoDetect(_Configuration.GetConnectionString("DbGerVeiculos"))
             );
-
-
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -90,6 +89,8 @@ namespace ClienteNet6.Server.Context
                 .HasOne(p => p.Veiculo)
                 .WithMany()
                 .HasForeignKey(fk => fk.IdVeiculo);
+
+            builder.Entity<Log>().HasCharSet("latin1");
         }
     }
 }
