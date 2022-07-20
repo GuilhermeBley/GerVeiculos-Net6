@@ -1,4 +1,5 @@
 using ClienteNet6.Server.Context;
+using ClienteNet6.Server.Filter;
 using ClienteNet6.Server.Identity;
 using ClienteNet6.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -9,13 +10,12 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 {
     // Add services to the container.
-    builder.Services.AddControllers();
+    builder.Services.AddControllers(options =>
+    {
+        options.Filters.Add<LogAsyncActionFilter>();
+    });
     builder.Services
-        .AddRazorPages()
-        .AddRazorPagesOptions(options =>
-        {
-            options.Conventions.AuthorizePage("/login");
-        });
+        .AddRazorPages();
 
     #region Services
 
@@ -25,7 +25,8 @@ var builder = WebApplication.CreateBuilder(args);
         .AddScoped<ITokenService, TokenService>()
         .AddScoped<IUserService, UserService>()
         .AddScoped<IVeiculoService, VeiculoService>()
-        .AddScoped<IInfracaoService, InfracaoService>();
+        .AddScoped<IInfracaoService, InfracaoService>()
+        .AddScoped<ILogService, LogService>();
 
     #endregion
 

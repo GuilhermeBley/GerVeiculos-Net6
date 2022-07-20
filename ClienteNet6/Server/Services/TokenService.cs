@@ -40,7 +40,8 @@ namespace ClienteNet6.Server.Services
                     new Claim(JwtRegisteredClaimNames.Name, usuario.UserName),
                     new Claim(JwtRegisteredClaimNames.NameId, usuario.Id.ToString()),
                     new Claim(JwtRegisteredClaimNames.FamilyName, usuario.NomeEmpresa),
-                    new Claim(JwtRegisteredClaimNames.Email, usuario.Email)
+                    new Claim(JwtRegisteredClaimNames.Email, usuario.Email),
+                    new Claim(ClaimTypes.Email, usuario.Email)
                 })
             };
 
